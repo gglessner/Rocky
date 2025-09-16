@@ -2,9 +2,10 @@
 FROM rockylinux/rockylinux:latest
 
 # Set metadata
-LABEL maintainer="Your Name <your.email@example.com>"
-LABEL description="Rocky Linux 8.6 Docker Image with kernel 4.18.0 and glibc 2.28"
+LABEL maintainer="Garland Glessner <gglessner@gmail.com>"
+LABEL description="Rocky Linux 8.6 Docker Image with kernel 4.18.0 and glibc 2.28 - Compiled Exploits Generator"
 LABEL version="8.6"
+LABEL license="GPL-3.0"
 
 # Update system packages
 RUN dnf update -y && \
@@ -34,6 +35,14 @@ RUN dnf install -y \
     libacl-devel \
     libattr-devel \
     libffi-devel \
+    binutils \
+    binutils-devel \
+    elfutils-libelf-devel \
+    zlib-devel \
+    openssl-devel \
+    ncurses-devel \
+    readline-devel \
+    sqlite-devel \
     && dnf clean all
 
 # Set working directory
@@ -45,8 +54,11 @@ RUN useradd -m -s /bin/bash rocky && \
 
 # Copy exploit testing script and set permissions (as root)
 COPY test-exploits.sh /home/rocky/test-exploits.sh
+COPY comprehensive-compile-all.sh /home/rocky/comprehensive-compile-all.sh
 RUN chown rocky:rocky /home/rocky/test-exploits.sh && \
-    chmod +x /home/rocky/test-exploits.sh
+    chown rocky:rocky /home/rocky/comprehensive-compile-all.sh && \
+    chmod +x /home/rocky/test-exploits.sh && \
+    chmod +x /home/rocky/comprehensive-compile-all.sh
 
 # Switch to non-root user
 USER rocky
@@ -56,59 +68,8 @@ WORKDIR /home/rocky
 RUN git clone https://github.com/JlSakuya/Linux-Privilege-Escalation-Exploits.git && \
     chmod -R 755 Linux-Privilege-Escalation-Exploits
 
-# Create working exploits directory and copy successfully compiled exploits
-RUN mkdir -p /home/rocky/working-exploits && \
-    cd Linux-Privilege-Escalation-Exploits && \
-    # Copy CVE-2021-4034 (PwnKit)
-    cp -r 2021/CVE-2021-4034 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2021-4034 && \
-    gcc -o cve-2021-4034-poc cve-2021-4034-poc.c && \
-    # Copy CVE-2021-3493
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2021/CVE-2021-3493 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2021-3493 && \
-    gcc -o exploit exploit.c && \
-    # Copy CVE-2021-22555 exp-1
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2021/CVE-2021-22555/exp-1 /home/rocky/working-exploits/CVE-2021-22555-exp1 && \
-    cd /home/rocky/working-exploits/CVE-2021-22555-exp1 && \
-    gcc -o exploit exploit.c && \
-    # Copy CVE-2019-13272
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2019/CVE-2019-13272 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2019-13272 && \
-    gcc -o CVE-2019-13272 CVE-2019-13272.c && \
-    # Copy CVE-2017-7308
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2017/CVE-2017-7308 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2017-7308 && \
-    gcc -o poc poc.c && \
-    # Copy CVE-2017-6074
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2017/CVE-2017-6074 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2017-6074 && \
-    gcc -o poc poc.c && \
-    # Copy CVE-2017-5123
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2017/CVE-2017-5123 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2017-5123 && \
-    gcc -o 43029 43029.c && \
-    # Copy CVE-2017-8890 (with pthread linking)
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2017/CVE-2017-8890 /home/rocky/working-exploits/ && \
-    cd /home/rocky/working-exploits/CVE-2017-8890 && \
-    gcc -o exp-ret2usr exp-ret2usr.c -lpthread && \
-    gcc -o exp-smep exp-smep.c -lpthread && \
-    # Copy CVE-2016-5195 (Dirty COW) exp-1
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2016/CVE-2016-5195/exp-1 /home/rocky/working-exploits/CVE-2016-5195-exp1 && \
-    cd /home/rocky/working-exploits/CVE-2016-5195-exp1 && \
-    gcc -o dirtycow dirty.c -lpthread -lcrypt && \
-    # Copy CVE-2016-5195 (Dirty COW) exp-2
-    cd /home/rocky/Linux-Privilege-Escalation-Exploits && \
-    cp -r 2016/CVE-2016-5195/exp-2 /home/rocky/working-exploits/CVE-2016-5195-exp2 && \
-    cd /home/rocky/working-exploits/CVE-2016-5195-exp2 && \
-    gcc -o 40611 40611.c -lpthread && \
+# Run comprehensive compilation script to compile all possible exploits
+RUN ./comprehensive-compile-all.sh && \
     # Set proper permissions
     chmod -R 755 /home/rocky/working-exploits && \
     # Create archive of compiled exploits

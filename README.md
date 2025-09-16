@@ -1,11 +1,11 @@
 # Rocky Linux 8.6 Docker Container - Compiled Exploits Generator
 
-This Docker container is specifically designed to **generate `compiled-exploits.tgz`** - a portable archive containing **16 pre-compiled Linux privilege escalation exploits** ready for Red Hat Enterprise Linux 8.10 (Ootpa) systems.
+This Docker container is specifically designed to **generate `compiled-exploits.tgz`** - a portable archive containing **17 pre-compiled Linux privilege escalation exploits** ready for Red Hat Enterprise Linux 8.10 (Ootpa) systems.
 
 ## **Main Deliverable: `compiled-exploits.tgz`**
 
 The primary purpose of this container is to create a portable archive containing:
-- **16 working privilege escalation exploits** (pre-compiled binaries)
+- **17 working privilege escalation exploits** (pre-compiled binaries)
 - **Complete source code** for each exploit
 - **Comprehensive documentation** and usage instructions
 - **Red Hat 8.10 compatibility** (glibc 2.28, kernel 4.18.0 series)
@@ -194,7 +194,7 @@ Binaries compiled in this container will run seamlessly on Red Hat 8.10 without 
 
 ## **Success Metrics**
 
-- **400% increase** in working exploits (4 → 16)
+- **425% increase** in working exploits (4 → 17)
 - **All exploits pre-compiled** and ready to run
 - **Complete documentation** for each exploit
 - **Red Hat 8.10 compatible** (glibc 2.28)

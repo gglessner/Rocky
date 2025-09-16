@@ -52,12 +52,9 @@ WORKDIR /root
 RUN useradd -m -s /bin/bash rocky && \
     echo "rocky ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Copy exploit testing script and set permissions (as root)
-COPY test-exploits.sh /home/rocky/test-exploits.sh
+# Copy comprehensive compilation script and set permissions (as root)
 COPY comprehensive-compile-all.sh /home/rocky/comprehensive-compile-all.sh
-RUN chown rocky:rocky /home/rocky/test-exploits.sh && \
-    chown rocky:rocky /home/rocky/comprehensive-compile-all.sh && \
-    chmod +x /home/rocky/test-exploits.sh && \
+RUN chown rocky:rocky /home/rocky/comprehensive-compile-all.sh && \
     chmod +x /home/rocky/comprehensive-compile-all.sh
 
 # Switch to non-root user
